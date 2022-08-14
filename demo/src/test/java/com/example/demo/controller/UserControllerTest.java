@@ -58,11 +58,30 @@ public class UserControllerTest {
 
         assertThat(outputInJson).isEqualTo(inputInJson);
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-
-
     }
     private String mapToJson(Object object) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(object);
+    }
+    @Test
+    public void getUserById() throws Exception {
+        User user = new User();
+        user.setUserUniqueId(2000L);
+        user.setFirstName("james");
+        user.setLastName("anderson");
+        user.setEmail("james@gmail.com");
+        user.setGender("male");
+        user.setMobileNo(12456780L);
+        Mockito.when(userService.getUser(Mockito.anyLong())).thenReturn(user);
+
+        String URI = "/api/user/user/2000";
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
+                URI).accept(
+                MediaType.APPLICATION_JSON);
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        String expectedJson = this.mapToJson(user);
+        String outputInJson = result.getResponse().getContentAsString();
+        assertThat(outputInJson).isEqualTo(expectedJson);
+
     }
 }
