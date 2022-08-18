@@ -18,6 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -64,7 +68,7 @@ public class UserControllerTest {
         return objectMapper.writeValueAsString(object);
     }
     @Test
-    public void getUserById() throws Exception {
+    public void testGetUserById() throws Exception {
         User user = new User();
         user.setUserUniqueId(2000L);
         user.setFirstName("james");
@@ -84,4 +88,39 @@ public class UserControllerTest {
         assertThat(outputInJson).isEqualTo(expectedJson);
 
     }
-}
+    @Test
+    public void testGetAllUsers() throws Exception {
+        User user = new User();
+        user.setUserUniqueId(1001L);
+        user.setFirstName("kane");
+        user.setLastName("anderson");
+        user.setEmail("kane@gmail.com");
+        user.setGender("male");
+        user.setMobileNo(12456780L);
+
+        User user1 = new User();
+        user1.setUserUniqueId(1000L);
+        user1.setFirstName("james");
+        user1.setLastName("anderson");
+        user1.setEmail("james@gmail.com");
+        user1.setGender("female");
+        user1.setMobileNo(12456780L);
+
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+        userList.add(user1);
+
+        Mockito.when(userService.getAllUsers()).thenReturn(userList);
+
+        String URI = "/api/user/users";
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
+                URI).accept(
+                MediaType.APPLICATION_JSON);
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        String expectedJson = this.mapToJson(userList);
+        String outputInJson = result.getResponse().getContentAsString();
+        assertThat(outputInJson).isEqualTo(expectedJson);
+
+    }
+
+    }
